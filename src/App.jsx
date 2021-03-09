@@ -1,13 +1,110 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
+import Filter from "./components/FilterButton";
+import ListItem from "./components/ListItem";
+import Form from "./components/Form";
+import FilterButton from "./components/FilterButton";
+import { useRef } from "react/cjs/react.development";
 
-function App() {
-  const [count, setCount] = useState(0)
+const TABNAME_MAP = [
+  {
+    name: "全部任务",
+    label: 0,
+  },
+  {
+    name: "进行中",
+    label: 1,
+  },
+  {
+    name: "已完成",
+    label: 2,
+  },
+];
+
+function App(props) {
+  const [taskList, setTaskList] = useState(props.taskList);
+  const [nowTab, setNowTab] = useState(0); // 0全部 1进行中 2已完成
+
+  const listHeadingRef = useRef(null);
+
+  const changeTaskList = (newTaskList) => {
+    window.localStorage.setItem(
+      "reactA11yTaskList",
+      JSON.stringify(newTaskList)
+    );
+    setTaskList(newTaskList);
+  };
+
+  const addTask = (name) => {
+    const newTask = { id: Date.now(), name, completed: false };
+    const newTaskList = [...taskList, newTask];
+    changeTaskList(newTaskList)
+  };
+
+  const toggleTaskCompleted = (id) => {
+    const newTaskList = taskList.map((item) => {
+      if (item.id === id) {
+        return { ...item, completed: !item.completed };
+      }
+      return item;
+    });
+    changeTaskList(newTaskList)
+  };
+
+  const deleteTask = (id) => {
+    const newTaskList = taskList.filter((item) => item.id !== id);
+    changeTaskList(newTaskList)
+    listHeadingRef.current.focus();
+  };
+
+  const editTask = (id, newName) => {
+    const newTaskList = taskList.map((item) => {
+      if (item.id === id) {
+        return { ...item, name: newName };
+      }
+      return item;
+    });
+    changeTaskList(newTaskList)
+  };
 
   return (
-    <div className="App">
-      
+    <div className="todoapp stack-large">
+      <Form addTask={addTask}></Form>
+      <div className="filters btn-group stack-exception">
+        {TABNAME_MAP.map((item, index) => {
+          return (
+            <FilterButton
+              key={index}
+              name={item.name}
+              label={item.label}
+              isPressed={index === nowTab}
+              setNowTab={setNowTab}
+            ></FilterButton>
+          );
+        })}
+      </div>
+      <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
+        剩余{taskList.filter((item) => !item.completed).length}条任务未完成
+      </h2>
+      <ul
+        role="list"
+        className="todo-list stack-large stack-exception"
+        aria-labelledby="list-heading"
+      >
+        {taskList.map((item) => {
+          return (
+            <ListItem
+              key={item.id}
+              item={item}
+              nowTab={nowTab}
+              editTask={editTask}
+              deleteTask={deleteTask}
+              toggleTaskCompleted={toggleTaskCompleted}
+            ></ListItem>
+          );
+        })}
+      </ul>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
