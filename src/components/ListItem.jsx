@@ -92,7 +92,7 @@ function ListItem(props) {
     if (editing) {
       editInputRef.current.focus();
     } else {
-      editButtonRef.current.focus();
+      // editButtonRef.current.focus();
     }
   }, [editing]);
 
