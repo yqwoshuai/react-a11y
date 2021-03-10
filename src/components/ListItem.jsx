@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { usePrevious } from "./hooks";
 
 function ListItem(props) {
   const [editing, setEditing] = useState(false);
@@ -26,6 +27,7 @@ function ListItem(props) {
   const editTemp = (
     <form className="stack-small" onSubmit={editSubmit}>
       <div className="from-group">
+        {/* label与input成对出现 */}
         <label className="todo-label" htmlFor={id}>
           请输入{name}的新名称
         </label>
@@ -46,6 +48,7 @@ function ListItem(props) {
             setEditing(false);
           }}
         >
+          {/* 在视觉上隐藏的文案，能被屏幕阅读器读取，更加友好 */}
           取消<span className="visually-hidden">{name} 任务的重命名</span>
         </button>
         <button type="submit" className="btn btn__primary todo-edit">
@@ -88,13 +91,19 @@ function ListItem(props) {
     </div>
   );
 
+  // 通过获取之前的编辑状态，达到对focus更精细的控制
+  const wasEditing = usePrevious(editing);
+
   useEffect(() => {
-    if (editing) {
+    // 从未编辑状态 切换到 编辑状态 时，让编辑框获得焦点
+    if (!wasEditing && editing) {
       editInputRef.current.focus();
-    } else {
-      // editButtonRef.current.focus();
     }
-  }, [editing]);
+    // 从编辑状态 切换到 未编辑状态 时，让编辑按钮获得焦点
+    if (wasEditing && !editing) {
+      editButtonRef.current.focus();
+    }
+  }, [editing, wasEditing]);
 
   if (
     props.nowTab === 0 ||

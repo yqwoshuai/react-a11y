@@ -21,6 +21,7 @@ function Form(props) {
   return (
     <form onSubmit={submitTodoItem}>
       <h2 className="label-wrapper">
+        {/* 使用label包裹内容，点击标题也能使对应的input focus到光标 */}
         <label className="label__lg" htmlFor="new-todo-input">
           请输入代办事项内容
         </label>

@@ -53,6 +53,7 @@ function App(props) {
   const deleteTask = (id) => {
     const newTaskList = taskList.filter((item) => item.id !== id);
     changeTaskList(newTaskList)
+    // 删除任务时，让焦点回到主标题，可以知道还剩多少任务
     listHeadingRef.current.focus();
   };
 
@@ -85,6 +86,9 @@ function App(props) {
       <h2 id="list-heading" tabIndex="-1" ref={listHeadingRef}>
         剩余{taskList.filter((item) => !item.completed).length}条任务未完成
       </h2>
+      {/* role指定ul的身份为一个list */}
+      {/* aria-labelledby在ul标签获得焦点时，屏幕阅读器会把对应id元素的内容读出来 */}
+      {/* 如果一个元素同时有aria-labelledby和aria-label，读屏软件会优先读出aria-labelledby的内容 */}
       <ul
         role="list"
         className="todo-list stack-large stack-exception"
