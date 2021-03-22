@@ -36,7 +36,7 @@ function App(props) {
   const addTask = (name) => {
     const newTask = { id: Date.now(), name, completed: false };
     const newTaskList = [...taskList, newTask];
-    changeTaskList(newTaskList)
+    changeTaskList(newTaskList);
   };
 
   const toggleTaskCompleted = (id) => {
@@ -46,12 +46,12 @@ function App(props) {
       }
       return item;
     });
-    changeTaskList(newTaskList)
+    changeTaskList(newTaskList);
   };
 
   const deleteTask = (id) => {
     const newTaskList = taskList.filter((item) => item.id !== id);
-    changeTaskList(newTaskList)
+    changeTaskList(newTaskList);
     // 删除任务时，让焦点回到主标题，可以知道还剩多少任务
     listHeadingRef.current.focus();
   };
@@ -63,13 +63,34 @@ function App(props) {
       }
       return item;
     });
-    changeTaskList(newTaskList)
+    changeTaskList(newTaskList);
+  };
+
+  // 切换按钮实现键盘左右切换选中
+  const btnFocus = () => {
+    window.addEventListener("keydown", btnDownHandler, false);
+  };
+  const btnBlur = () => {
+    window.removeEventListener("keydown", btnDownHandler);
+  };
+  const btnDownHandler = (e) => {
+    if (e.keyCode === 37 && e.target.previousElementSibling) {
+      e.target.previousElementSibling.focus();
+    }
+    if (e.keyCode === 39 && e.target.nextElementSibling) {
+      e.target.nextElementSibling.focus();
+    }
   };
 
   return (
     <div className="todoapp stack-large">
       <Form addTask={addTask}></Form>
-      <div className="filters btn-group stack-exception">
+      <div
+        className="filters btn-group stack-exception"
+        tabIndex="-1"
+        onFocus={btnFocus}
+        onBlur={btnBlur}
+      >
         {TABNAME_MAP.map((item, index) => {
           return (
             <FilterButton
@@ -92,6 +113,7 @@ function App(props) {
         role="list"
         className="todo-list stack-large stack-exception"
         aria-labelledby="list-heading"
+        tabIndex="-1"
       >
         {taskList.map((item) => {
           return (

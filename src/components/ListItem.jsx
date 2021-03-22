@@ -24,6 +24,14 @@ function ListItem(props) {
     setNewName(e.target.value);
   };
 
+  // checkbox 支持回车切换
+  const checkboxKeydown = (e) => {
+    if (e.keyCode === 13) {
+      e.target.checked = !e.target.checked;
+      props.toggleTaskCompleted(id);
+    }
+  };
+
   const editTemp = (
     <form className="stack-small" onSubmit={editSubmit}>
       <div className="from-group">
@@ -66,6 +74,7 @@ function ListItem(props) {
           type="checkbox"
           defaultChecked={completed}
           onChange={() => props.toggleTaskCompleted(id)}
+          onKeyDown={checkboxKeydown}
         />
         <label className="todo-label" htmlFor={id}>
           {name}
